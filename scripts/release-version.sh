@@ -76,6 +76,36 @@ else
     echo "OK"    
 fi
 
+echo -n "Checking for tabs in UseLATEX.cmake..."
+if fgrep -q "$(printf '\t')" UseLATEX.cmake
+then
+    echo "FAIL"
+    echo
+    echo "Tab characters were found in UseLATEX.cmake. For consistent style"
+    echo "replace all tab characters with spaces to the desired column."
+    exit 1
+else
+    echo "OK"
+fi
+
+echo -n "Extracting notes for $version..."
+version_notes=`sed -n "/# $version/,/# [0-9]/{
+/# [0-9]/d
+s/^#       //
+s/^# *//
+p
+}" UseLATEX.cmake`
+if [ \( $? -eq 0 \) -a \( -n "$version_notes" \) ]
+then
+    echo "OK"
+else
+    echo "FAIL"
+    echo
+    echo "Could not find the notes for this release in the History list."
+    echo "Make sure an item has been added to the release history."
+    ask_keep_going
+fi
+
 echo -n "Checking that the working directory is clean..."
 if [ -z "`git status --porcelain`" ]
 then
@@ -127,7 +157,13 @@ fi
 
 # We are finished with all the checks. Do the tag.
 echo -n "Tagging with $git_version_tag..."
-if git tag $git_version_tag
+if git tag --annotate --edit --message="UseLATEX.cmake Release $version
+$version_notes
+
+# Write a message for tag:
+#   $git_version_tag
+# Lines starting with '#' will be ignored.
+" $git_version_tag
 then
     echo "OK"
 else
