@@ -1303,9 +1303,11 @@ function(latex_process_images dvi_outputs_var pdf_outputs_var)
       make_directory("${path}")
 
       # Do conversions for dvi.
-      latex_convert_image(output_files "${file}" .eps "${convert_flags}"
-        "${LATEX_DVI_IMAGE_EXTENSIONS}" "${ARGN}")
-      list(APPEND dvi_outputs ${output_files})
+      if(NOT LATEX_FORCE_PDF)
+          latex_convert_image(output_files "${file}" .eps "${convert_flags}"
+            "${LATEX_DVI_IMAGE_EXTENSIONS}" "${ARGN}")
+          list(APPEND dvi_outputs ${output_files})
+      endif ()
 
       # Do conversions for pdf.
       if(is_raster)
