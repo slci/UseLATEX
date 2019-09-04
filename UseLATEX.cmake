@@ -115,7 +115,7 @@
 #
 # History:
 #
-# 2.6.0 Skip image conversiontargets that are not used when a force option
+# 2.6.0 Skip image conversion targets that are not used when a force option
 #       is given. This helps prevent errors for missing conversion programs
 #       that are not needed. (Thanks to Martin Wetzel.)
 #
