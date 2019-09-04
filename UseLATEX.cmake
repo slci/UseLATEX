@@ -1,6 +1,6 @@
 # File: UseLATEX.cmake
 # CMAKE commands to actually use the LaTeX compiler
-# Version: 2.5.0
+# Version: 2.6.0
 # Author: Kenneth Moreland <kmorel@sandia.gov>
 #
 # Copyright 2004, 2015 Sandia Corporation.
@@ -114,6 +114,10 @@
 #       in the multibib package.
 #
 # History:
+#
+# 2.6.0 Skip image conversiontargets that are not used when a force option
+#       is given. This helps prevent errors for missing conversion programs
+#       that are not needed. (Thanks to Martin Wetzel.)
 #
 # 2.5.0 Parse biber output for warnings.
 #
@@ -1310,14 +1314,16 @@ function(latex_process_images dvi_outputs_var pdf_outputs_var)
       endif ()
 
       # Do conversions for pdf.
-      if(is_raster)
-        latex_convert_image(output_files "${file}" .png "${convert_flags}"
-          "${LATEX_PDF_IMAGE_EXTENSIONS}" "${ARGN}")
-        list(APPEND pdf_outputs ${output_files})
-      else()
-        latex_convert_image(output_files "${file}" .pdf "${convert_flags}"
-          "${LATEX_PDF_IMAGE_EXTENSIONS}" "${ARGN}")
-        list(APPEND pdf_outputs ${output_files})
+      if(NOT LATEX_FORCE_DVI AND NOT LATEX_FORCE_HTML)
+        if(is_raster)
+          latex_convert_image(output_files "${file}" .png "${convert_flags}"
+            "${LATEX_PDF_IMAGE_EXTENSIONS}" "${ARGN}")
+          list(APPEND pdf_outputs ${output_files})
+        else()
+          latex_convert_image(output_files "${file}" .pdf "${convert_flags}"
+            "${LATEX_PDF_IMAGE_EXTENSIONS}" "${ARGN}")
+          list(APPEND pdf_outputs ${output_files})
+        endif()
       endif()
     else()
       message(WARNING "Could not find file ${CMAKE_CURRENT_SOURCE_DIR}/${file}.  Are you sure you gave relative paths to IMAGES?")
