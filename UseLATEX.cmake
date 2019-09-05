@@ -53,6 +53,7 @@
 #                    [USE_GLOSSARY] [USE_NOMENCL]
 #                    [FORCE_PDF] [FORCE_DVI] [FORCE_HTML]
 #                    [TARGET_NAME] <name>
+#                    [TEXINPUTS <path>]
 #                    [EXCLUDE_FROM_ALL]
 #                    [EXCLUDE_FROM_DEFAULTS])
 #       Adds targets that compile <tex_file>.  The latex output is placed
@@ -112,6 +113,12 @@
 #       given, then additional bibtex calls are added to the build to
 #       support the extra auxiliary files created with the \newcite command
 #       in the multibib package.
+#
+#       TEXINPUTS allows setting the TEXINPUTS environment variable for
+#       the latex and pdflatex commands. The path should be written with
+#       the host system's conventions (i.e. with ':' to separate path
+#       components on Unix and ';' on Windows). If the TEXINPUTS option is not
+#       given, the TEXINPUTS directory property is queried instead.
 #
 # History:
 #
@@ -385,6 +392,14 @@ if(__USE_LATEX_INCLUDED)
   return()
 endif()
 set(__USE_LATEX_INCLUDED TRUE)
+
+if(NOT CMAKE_SCRIPT_MODE_FILE)
+  # If not in scripting mode, define the TEXINPUTS directory property that can
+  # be used to set the TEXINPUTS environment variable for latex and pdflatex.
+  define_property(DIRECTORY PROPERTY TEXINPUTS INHERITED
+    BRIEF_DOCS "Value of TEXINPUTS to use for LATEX"
+    FULL_DOCS  "Value of TEXINPUTS to use for LATEX")
+endif()
 
 #############################################################################
 # Find the location of myself while originally executing.  If you do this
@@ -1415,6 +1430,7 @@ function(parse_add_latex_arguments command latex_main_input)
     )
   set(oneValueArgs
     TARGET_NAME
+    TEXINPUTS
     )
   set(multiValueArgs
     BIBFILES
@@ -1450,6 +1466,21 @@ function(parse_add_latex_arguments command latex_main_input)
   endif()
   if(LATEX_MANGLE_TARGET_NAMES)
     latex_usage(${command} "MANGLE_TARGET_NAMES option removed in version 2.0. All LaTeX targets use mangled names now.")
+  endif()
+
+  if(NOT LATEX_TEXINPUTS)
+    # If the command did not specify the TEXINPUTS argument, check for a
+    # TEXINPUTS property on the current directory.
+    get_property(_texinputs DIRECTORY PROPERTY TEXINPUTS)
+    if(_texinputs)
+      set(LATEX_TEXINPUTS "${_texinputs}")
+    endif()
+  endif()
+
+  if(LATEX_TEXINPUTS AND CMAKE_HOST_WIN32)
+    # To put actual an actual ';' in an argument to exec_process, replace
+    # it with the $<SEMICOLON> generator expression.
+    string(REPLACE ";" "$<SEMICOLON>" LATEX_TEXINPUTS "${LATEX_TEXINPUTS}")
   endif()
 
   # Capture the first argument, which is the main LaTeX input.
@@ -1505,6 +1536,14 @@ function(add_latex_targets_internal)
         -D LATEX_LOG_FILE="${LATEX_TARGET}.log"
         -P "${LATEX_USE_LATEX_LOCATION}"
       )
+  endif()
+
+  if(LATEX_TEXINPUTS)
+    # Set the TEXINPUTS environment variable
+    set(latex_build_command
+      ${CMAKE_COMMAND} -E env TEXINPUTS=${LATEX_TEXINPUTS} ${latex_build_command})
+    set(pdflatex_build_command
+      ${CMAKE_COMMAND} -E env TEXINPUTS=${LATEX_TEXINPUTS} ${pdflatex_build_command})
   endif()
 
   if(NOT LATEX_TARGET_NAME)
