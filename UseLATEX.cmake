@@ -1,6 +1,6 @@
 # File: UseLATEX.cmake
 # CMAKE commands to actually use the LaTeX compiler
-# Version: 2.6.0
+# Version: 2.6.1
 # Author: Kenneth Moreland <kmorel@sandia.gov>
 #
 # Copyright 2004, 2015 Sandia Corporation.
@@ -114,6 +114,10 @@
 #       in the multibib package.
 #
 # History:
+#
+# 2.6.1 Fix issue with detecting long undefined reference warnings that
+#       LaTeX "helpfully" split across lines (and which fowled up our
+#       regex).
 #
 # 2.6.0 Skip image conversion targets that are not used when a force option
 #       is given. This helps prevent errors for missing conversion programs
@@ -801,15 +805,15 @@ function(latex_check_important_warnings)
 
   file(READ ${log_file} log)
 
-  # Check for undefined references
+  # Check for declared LaTeX warnings
   string(REGEX MATCHALL
-    "\n[^\n]*Reference[^\n]*undefined[^\n]*"
-    reference_warnings
+    "\nLaTeX Warning:[^\n]*"
+    latex_warnings
     "${log}")
-  if(reference_warnings)
+  if(latex_warnings)
     set(found_error TRUE)
-    message("\nFound missing reference warnings.")
-    foreach(warning ${reference_warnings})
+    message("\nFound declared LaTeX warnings.")
+    foreach(warning ${latex_warnings})
       string(STRIP "${warning}" warning_no_newline)
       message("${warning_no_newline}")
     endforeach(warning)
