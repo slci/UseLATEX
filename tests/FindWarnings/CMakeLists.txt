@@ -11,3 +11,5 @@ add_latex_document(UndefinedReferenceLong.tex)
 add_latex_document(Natbib.tex)
 
 add_latex_document(Overfull.tex)
+
+add_latex_document(DuplicateLabel.tex)
