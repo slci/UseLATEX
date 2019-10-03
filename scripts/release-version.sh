@@ -90,8 +90,8 @@ fi
 
 echo -n "Extracting notes for $version..."
 version_notes=`sed -n "/# $version/,/# [0-9]/{
-/# [0-9]/d
-s/^#       //
+s/^# $version *//
+/^# [0-9]/d
 s/^# *//
 p
 }" UseLATEX.cmake`
@@ -105,6 +105,8 @@ else
     echo "Make sure an item has been added to the release history."
     ask_keep_going
 fi
+version_notes="
+$version_notes"
 
 echo -n "Checking that the working directory is clean..."
 if [ -z "`git status --porcelain`" ]
