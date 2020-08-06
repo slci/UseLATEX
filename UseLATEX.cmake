@@ -120,6 +120,9 @@
 #
 # History:
 #
+# 2.7.1 Fix issues with printing log on errors when there are spaces in the
+#       path. (Thanks to Peter Knowles.)
+#
 # 2.7.0 Add INCLUDE_DIRECTORIES parameters. (Thanks to Eric Dönges.)
 #
 # 2.6.1 Fix issue with detecting long undefined reference warnings that
