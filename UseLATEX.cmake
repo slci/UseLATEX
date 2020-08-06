@@ -120,6 +120,9 @@
 #
 # History:
 #
+# 2.7.1 Fix issues with printing log on errors when there are spaces in the
+#       path. (Thanks to Peter Knowles.)
+#
 # 2.7.0 Add INCLUDE_DIRECTORIES parameters. (Thanks to Eric Dönges.)
 #
 # 2.6.1 Fix issue with detecting long undefined reference warnings that
@@ -502,12 +505,14 @@ function(latex_execute_latex)
   if(NOT ${execute_result} EQUAL 0)
     # LaTeX tends to write a file when a failure happens. Delete that file so
     # that LaTeX will run again.
-    file(REMOVE "${LATEX_WORKING_DIRECTORY}/${LATEX_OUTPUT_FILE}")
+    separate_arguments(LATEX_OUTPUT_FILE_SEP UNIX_COMMAND "${LATEX_OUTPUT_FILE}")
+    file(REMOVE "${LATEX_WORKING_DIRECTORY_SEP}/${LATEX_OUTPUT_FILE_SEP}")
 
     message("\n\nLaTeX command failed")
     message("${full_command_original}")
     message("Log output:")
-    file(READ "${LATEX_WORKING_DIRECTORY}/${LATEX_LOG_FILE}" log_output)
+    separate_arguments(LATEX_LOG_FILE_SEP UNIX_COMMAND "${LATEX_LOG_FILE}")
+    file(READ "${LATEX_WORKING_DIRECTORY_SEP}/${LATEX_LOG_FILE_SEP}" log_output)
     message("${log_output}")
     message(FATAL_ERROR "Executed LaTeX, but LaTeX returned an error.")
   endif()
