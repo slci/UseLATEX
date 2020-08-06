@@ -123,6 +123,8 @@
 # 2.7.1 Fix issues with printing log on errors when there are spaces in the
 #       path. (Thanks to Peter Knowles.)
 #
+#       Ignore LaTeX warning about the font shape series value `mc'.
+#
 # 2.7.0 Add INCLUDE_DIRECTORIES parameters. (Thanks to Eric Dönges.)
 #
 # 2.6.1 Fix issue with detecting long undefined reference warnings that
@@ -822,6 +824,10 @@ function(latex_check_important_warnings)
     "\nLaTeX Warning:[^\n]*"
     latex_warnings
     "${log}")
+  # Ignore warnings considered harmless
+  list(FILTER latex_warnings EXCLUDE REGEX
+    "LaTeX Warning: Font shape declaration has incorrect series value `mc'."
+    )
   if(latex_warnings)
     set(found_error TRUE)
     message("\nFound declared LaTeX warnings.")
