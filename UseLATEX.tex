@@ -1191,6 +1191,16 @@ my.image.pdf to something like my-image.pdf.
   If there is a file extension that you think should be added to the list
   of image extensions to check, send a note to the \UseLATEX maintainers.
 
+  \subsection{Why are some files in \textcmake{IMAGE\_DIRS} not processed?}
+  \label{sec:Why_are_some_files_in_IMAGE_DIRS_not_processed}
+
+  If \latex is telling you it cannot find an image file in an \textcmake{IMAGE\_DIRS} directory that you are sure should be picked up (i.e. does not have problems like \ref{sec:Why_is_my_image_file_not_being_automatically_converted}) you may just need to run \textprog{cmake} again.
+
+  This problem often occurs when a file is added to an \textcmake{IMAGE\_DIRS} directory.
+  \textcmake{IMAGE\_DIRS} works by globbing files in those directories at the time that CMake is directly run.
+  If you add a file to the directory, that file will not yet be part of the make files that CMake built, and there will be no known dependencies to try to find them.
+  Simply running \textprog{cmake} again will re-perform the glob and fix the problem.
+
   \subsection{Why is the \textcmake{MANGLE\_TARGET\_NAMES} option deprecated?}
   \label{sec:Why_is_the_MANGLE_TARGET_NAMES_option_deprecated}
 
