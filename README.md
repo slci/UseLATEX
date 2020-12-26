@@ -1,3 +1,5 @@
+A fork of https://gitlab.kitware.com/kmorel/UseLATEX repository.
+
 Compiling LaTeX files into readable documents is actually a very involved
 process. Although CMake comes with FindLATEX.cmake, it does nothing for you
 other than find the commands associated with LaTeX. I like using CMake to
