@@ -952,7 +952,7 @@ function(latex_setup_variables)
   latex_wantit(PS2PDF_CONVERTER ps2pdf)
   latex_wantit(PDFTOPS_CONVERTER pdftops)
 
-  set(LATEX_COMPILER_FLAGS "-interaction=batchmode -file-line-error"
+  set(LATEX_COMPILER_FLAGS "--shell-escape -interaction=batchmode -file-line-error"
     CACHE STRING "Flags passed to latex.")
   set(PDFLATEX_COMPILER_FLAGS ${LATEX_COMPILER_FLAGS}
     CACHE STRING "Flags passed to pdflatex.")
